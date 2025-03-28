@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>今天吃啥 - 随机午餐选择器</title>
-   
+  
     <style>
         :root {
             --primary: #FF6B6B;
@@ -113,6 +113,38 @@
         .card.show {
             opacity: 1;
             transform: rotateY(0deg) scale(1);
+        }
+        
+        /* 卡片向左滑出动画 */
+        .card.slide-out {
+            animation: slideOut 0.6s ease forwards;
+        }
+        
+        @keyframes slideOut {
+            0% {
+                transform: translateX(0) rotateY(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-100%) rotateY(-90deg);
+                opacity: 0;
+            }
+        }
+        
+        /* 卡片从右侧滑入动画 */
+        .card.slide-in {
+            animation: slideIn 0.6s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            0% {
+                transform: translateX(100%) rotateY(90deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0) rotateY(0deg);
+                opacity: 1;
+            }
         }
         
         .card.confirmed {
@@ -359,7 +391,7 @@
             currentFood = getRandomFood();
             
             // 重置动画
-            foodCard.classList.remove('show');
+            foodCard.classList.remove('show', 'slide-out', 'slide-in');
             void foodCard.offsetWidth; // 触发重绘
             
             // 更新内容
@@ -423,7 +455,16 @@
         // 重新选择
         function handleRechoose() {
             if (isAnimating) return;
-            showLoading();
+            isAnimating = true;
+            
+            // 添加向左滑出动画
+            foodCard.classList.add('slide-out');
+            
+            // 动画结束后加载新菜品
+            setTimeout(() => {
+                foodCard.classList.remove('show', 'slide-out');
+                showLoading();
+            }, 600);
         }
         
         // 确认选择
@@ -443,7 +484,7 @@
         
         // 重置应用
         function resetApp() {
-            foodCard.classList.remove('show', 'confirmed');
+            foodCard.classList.remove('show', 'confirmed', 'slide-out', 'slide-in');
             actionBtns.classList.add('hidden');
             mainBtn.classList.remove('hidden');
         }
