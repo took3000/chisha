@@ -4,164 +4,358 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>今天吃啥 - 随机午餐选择器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #292F36;
+            --light: #F7FFF7;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             margin: 0;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
+            padding: 0;
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            color: var(--dark);
         }
-
+        
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 28px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
         .main-btn {
-            width: 80%;
-            padding: 15px;
-            margin-top: 40vh;
-            background: #4CAF50;
+            width: 100%;
+            padding: 18px;
+            margin: 20px 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 50px;
             font-size: 18px;
+            font-weight: 500;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
-
+        
+        .main-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
         .main-btn:active {
-            transform: scale(0.98);
+            transform: translateY(1px);
         }
-
+        
+        .main-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .main-btn:hover::after {
+            opacity: 1;
+        }
+        
+        .main-btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
         .card {
-            width: 300px;
+            width: 100%;
             height: 400px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             overflow: hidden;
             position: relative;
+            transform-style: preserve-3d;
             opacity: 0;
-            transform: rotateY(180deg);
-            transition: all 0.8s ease;
+            transform: rotateY(180deg) scale(0.8);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white;
         }
-
+        
         .card.show {
             opacity: 1;
-            transform: rotateY(0deg);
+            transform: rotateY(0deg) scale(1);
         }
-
+        
+        .card.confirmed {
+            animation: bounce 0.6s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
         .food-img {
             width: 100%;
-            height: 80%;
+            height: 75%;
             object-fit: cover;
+            transition: transform 0.5s ease;
         }
-
-        .food-name {
-            display: block;
+        
+        .card:hover .food-img {
+            transform: scale(1.03);
+        }
+        
+        .food-info {
+            padding: 20px;
             text-align: center;
-            font-size: 24px;
-            padding: 15px;
-            color: #333;
         }
-
+        
+        .food-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .food-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
         .btn-group {
             width: 100%;
             display: flex;
             justify-content: space-between;
             margin-top: 30px;
-            gap: 10px;
+            gap: 15px;
         }
-
+        
         .btn {
-            width: 48%;
-            padding: 12px;
+            flex: 1;
+            padding: 15px;
             border: none;
-            border-radius: 25px;
+            border-radius: 50px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        
         .btn:active {
-            opacity: 0.8;
+            transform: translateY(1px);
         }
-
+        
         .reject {
-            background: #f44336;
-            color: white;
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
         }
-
+        
+        .reject:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
         .confirm {
-            background: #2196F3;
+            background: var(--primary);
             color: white;
         }
-
+        
+        .confirm:hover {
+            background: linear-gradient(45deg, var(--primary), #ff8e8e);
+        }
+        
         .hidden {
             display: none;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(78, 205, 196, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--secondary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
+            opacity: 0;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                height: 350px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <h1 class="title">今天吃啥 🍽️</h1>
+        
         <!-- 主按钮 -->
-        <button class="main-btn" id="mainBtn">看看今天吃啥</button>
-
+        <button class="main-btn" id="mainBtn">
+            <span>帮我选午餐</span>
+        </button>
+        
+        <!-- 加载动画 -->
+        <div class="loading hidden" id="loading"></div>
+        
         <!-- 菜品卡片 -->
         <div class="card" id="foodCard">
-            <img class="food-img" id="foodImg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
-            <span class="food-name" id="foodName"></span>
+            <img class="food-img" id="foodImg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="菜品图片">
+            <div class="food-info">
+                <h2 class="food-name" id="foodName"></h2>
+                <p class="food-desc" id="foodDesc"></p>
+            </div>
         </div>
-
+        
         <!-- 操作按钮组 -->
         <div class="btn-group hidden" id="actionBtns">
-            <button class="btn reject" onclick="handleRechoose()">不想吃</button>
-            <button class="btn confirm" onclick="handleConfirm()">就它啦</button>
+            <button class="btn reject" id="rejectBtn">换一个</button>
+            <button class="btn confirm" id="confirmBtn">就吃它</button>
         </div>
     </div>
-
+    
     <script>
         // 菜品数据
         const foods = [
             { 
                 name: '宫保鸡丁', 
-                img: 'https://via.placeholder.com/300x320/FFB6C1/000000?text=宫保鸡丁' 
+                img: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '经典川菜，麻辣鲜香，鸡肉嫩滑'
             },
             { 
                 name: '红烧牛肉面', 
-                img: 'https://via.placeholder.com/300x320/87CEEB/000000?text=牛肉面' 
+                img: 'https://images.unsplash.com/photo-1614644147798-f8c0fc1da3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '浓郁汤底，牛肉软烂，面条筋道'
             },
             { 
                 name: '蔬菜沙拉', 
-                img: 'https://via.placeholder.com/300x320/98FB98/000000?text=沙拉' 
+                img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '新鲜时蔬，健康低卡，多种搭配'
             },
             { 
-                name: '披萨', 
-                img: 'https://via.placeholder.com/300x320/FFA07A/000000?text=Pizza' 
+                name: '意大利披萨', 
+                img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '薄脆饼底，丰富配料，拉丝芝士'
+            },
+            { 
+                name: '日式寿司', 
+                img: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '新鲜鱼生，醋饭香甜，精致摆盘'
+            },
+            { 
+                name: '泰式绿咖喱', 
+                img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '椰香浓郁，微辣开胃，异国风味'
+            },
+            { 
+                name: '汉堡套餐', 
+                img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '多汁肉饼，松软面包，薯条可乐'
+            },
+            { 
+                name: '越南河粉', 
+                img: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+                desc: '清爽汤头，细滑米粉，香草点缀'
             }
         ];
-
+        
         // 获取DOM元素
         const mainBtn = document.getElementById('mainBtn');
+        const loading = document.getElementById('loading');
         const foodCard = document.getElementById('foodCard');
         const actionBtns = document.getElementById('actionBtns');
         const foodImg = document.getElementById('foodImg');
         const foodName = document.getElementById('foodName');
-
+        const foodDesc = document.getElementById('foodDesc');
+        const rejectBtn = document.getElementById('rejectBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+        
         // 初始化
         let currentFood = null;
-
+        let isAnimating = false;
+        
         // 随机选择菜品
         function getRandomFood() {
-            return foods[Math.floor(Math.random() * foods.length)];
+            let newFood;
+            do {
+                newFood = foods[Math.floor(Math.random() * foods.length)];
+            } while (currentFood && newFood.name === currentFood.name && foods.length > 1);
+            
+            return newFood;
         }
-
+        
+        // 显示加载动画
+        function showLoading() {
+            loading.classList.remove('hidden');
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                showFoodCard();
+            }, 800);
+        }
+        
         // 显示菜品卡片
         function showFoodCard() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
             currentFood = getRandomFood();
             
             // 重置动画
@@ -171,25 +365,98 @@
             // 更新内容
             foodImg.src = currentFood.img;
             foodName.textContent = currentFood.name;
+            foodDesc.textContent = currentFood.desc;
             
             // 显示元素
             mainBtn.classList.add('hidden');
             foodCard.classList.add('show');
             actionBtns.classList.remove('hidden');
+            
+            // 动画结束后重置状态
+            setTimeout(() => {
+                isAnimating = false;
+            }, 800);
         }
-
+        
+        // 创建彩色纸屑效果
+        function createConfetti() {
+            const container = document.querySelector('.container');
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#A5DEE4', '#D4A5A5'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = -10 + 'px';
+                confetti.style.width = Math.random() * 8 + 4 + 'px';
+                confetti.style.height = Math.random() * 8 + 4 + 'px';
+                confetti.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+                container.appendChild(confetti);
+                
+                const animationDuration = Math.random() * 3 + 2;
+                
+                confetti.style.animation = `fall ${animationDuration}s ease-in forwards`;
+                
+                // 定义下落动画
+                const keyframes = `
+                    @keyframes fall {
+                        to {
+                            transform: translate(${Math.random() * 200 - 100}px, ${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                
+                const styleEl = document.createElement('style');
+                styleEl.innerHTML = keyframes;
+                document.head.appendChild(styleEl);
+                
+                // 移除元素
+                setTimeout(() => {
+                    confetti.remove();
+                    styleEl.remove();
+                }, animationDuration * 1000);
+            }
+        }
+        
         // 重新选择
         function handleRechoose() {
-            showFoodCard();
+            if (isAnimating) return;
+            showLoading();
         }
-
+        
         // 确认选择
         function handleConfirm() {
-            alert('Enjoy your meal! 🍴');
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            foodCard.classList.add('confirmed');
+            createConfetti();
+            
+            setTimeout(() => {
+                alert(`已选择: ${currentFood.name}\n祝您用餐愉快! 🍴`);
+                resetApp();
+                isAnimating = false;
+            }, 1000);
         }
-
+        
+        // 重置应用
+        function resetApp() {
+            foodCard.classList.remove('show', 'confirmed');
+            actionBtns.classList.add('hidden');
+            mainBtn.classList.remove('hidden');
+        }
+        
         // 事件绑定
-        mainBtn.addEventListener('click', showFoodCard);
+        mainBtn.addEventListener('click', showLoading);
+        rejectBtn.addEventListener('click', handleRechoose);
+        confirmBtn.addEventListener('click', handleConfirm);
+        
+        // 图片加载错误处理
+        foodImg.onerror = function() {
+            this.src = 'https://via.placeholder.com/600x450/F7FFF7/292F36?text=图片加载失败';
+        };
     </script>
 </body>
 </html>
